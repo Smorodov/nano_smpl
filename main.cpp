@@ -635,7 +635,7 @@ void main(int argc, char** argv)
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowPosition(0, 0);
     glutInitWindowSize(width, height);
-    trackball = new MyTrackBall(width, height,0.1);
+    trackball = new MyTrackBall(width, height,0.2);
     // Create window, set callbacks
     int mainHandle = glutCreateWindow("3D View");
     glutSetWindow(mainHandle);
@@ -674,10 +674,10 @@ void main(int argc, char** argv)
 //--------------------------------------------------------------------------
 void initialize(void)
 {
-    //model.loadModel("model/MANO_left.npz");
-    model.loadModel("model/SMPLH_female.npz");
+    model.loadModel("model/MANO_left.npz");
+    //model.loadModel("model/SMPLH_female.npz");
     //model.loadModel("model/generic_flame_model.npz");      
-    
+    //model.loadModel("model/generic_model.npz");
     glewInit();
     glGenBuffers(1, &vertices);
     glGenBuffers(1, &normals);

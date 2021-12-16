@@ -196,15 +196,13 @@ class smpl
         std::vector<int> level;
         std::vector<int> has_child;
         std::vector < std::vector<int> > paths;
-        std::vector< std::vector<int> > mas;
+        std::vector < std::vector<int> > mas;
         std::vector < std::vector<int> > chains;
 
         std::vector<float> joints_rots_vector;
         cnpy::NpyArray template_joints_abs_coords;        
-        cnpy::NpyArray posed_joints_abs_coords;
-        cnpy::NpyArray template_joints_rel_coords;
-        cnpy::NpyArray posed_joints_rel_coords;
-        float root_transform[16];
+        cnpy::NpyArray template_joints_rel_coords;        
+        cnpy::NpyArray posed_joints_rel_coords;        
         cnpy::NpyArray joint_rel_transforms;
         cnpy::NpyArray joint_abs_transforms;
         // thit need to apply pose diiven pca shape deformations
@@ -264,7 +262,7 @@ public:
     cnpy::NpyArray vetexNormals;
     cnpy::NpyArray jointCoords;
     Skeleton skeleton;
-    NormalsComputer* normalsComputer;
+    std::shared_ptr<NormalsComputer> normalsComputer;
     smpl();
     ~smpl();
 public:

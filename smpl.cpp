@@ -141,11 +141,11 @@ void makeTrasformsMatrix(cnpy::NpyArray& rotations, cnpy::NpyArray& translations
 {
     size_t n_transfarms = rotations.shape[0];
     // shape of the result tensors
-    std::vector<size_t> result_sz = { n_transfarms,4,4};
+    std::vector<size_t> result_sz = { n_transfarms,4,4 };
     // result tensors
     transforms = cnpy::NpyArray(result_sz, sizeof(float), false);
     // fille tthem with zeros
-    memset(transforms.data<float>(), 0, n_transfarms* 16 * sizeof(float));
+    memset(transforms.data<float>(), 0, n_transfarms * 16 * sizeof(float));
     // iterare vectors
     for (int n = 0; n < n_transfarms; ++n)
     {
@@ -259,7 +259,7 @@ void matMul4x4(float* A, float* B, float* dst)
     int i, j, k;
     bool needBuffer = false;
     if (dst == A || dst == B) { needBuffer = true; }
-    float* tmp=nullptr;
+    float* tmp = nullptr;
     if (needBuffer)
     {
         tmp = new float[N * N];
@@ -268,7 +268,7 @@ void matMul4x4(float* A, float* B, float* dst)
     {
         tmp = dst;
     }
-    
+
     for (i = 0; i < N; i++)
     {
         for (j = 0; j < N; j++)
@@ -291,11 +291,11 @@ void matMul4x4(float* A, float* B, float* dst)
 //--------------------------------------------------------------------------
 void smpl::BlendTransforms(cnpy::NpyArray& weights, cnpy::NpyArray& joint_rel_transforms, cnpy::NpyArray& blendedTransforms)
 {
-    std::vector<size_t> sz = {weights.shape[0], joint_rel_transforms.shape[1], joint_rel_transforms.shape[2]};
+    std::vector<size_t> sz = { weights.shape[0], joint_rel_transforms.shape[1], joint_rel_transforms.shape[2] };
     blendedTransforms = cnpy::NpyArray(sz, joint_rel_transforms.word_size, joint_rel_transforms.fortran_order);
     memset(blendedTransforms.data<float>(), 0, blendedTransforms.num_bytes());
     size_t n_vertices = sz[0];
-    size_t transform_sz = sz[1]*sz[2];
+    size_t transform_sz = sz[1] * sz[2];
     size_t n_bones = weights.shape[1];
     for (size_t i = 0; i < n_vertices; i++) // num vertices 778
     {
@@ -305,7 +305,7 @@ void smpl::BlendTransforms(cnpy::NpyArray& weights, cnpy::NpyArray& joint_rel_tr
         for (size_t j = 0; j < n_bones; j++) // num joints 16
         {
             size_t ind2 = j * transform_sz;
-            float w = weights.data<float>()[i*weights.shape[1]+j];
+            float w = weights.data<float>()[i * weights.shape[1] + j];
             if (fabs(w) > 1e-3) // shrink weak weights
             {
                 for (size_t k = 0; k < transform_sz; k++) // 16
@@ -332,16 +332,16 @@ void smpl::LinearBlend(cnpy::NpyArray& v_shaped, cnpy::NpyArray& weights, cnpy::
         float v_out[4] = { 0,0,0,1 };
         memcpy(v_in, v_shaped.data<float>() + 3 * i, 3 * sizeof(float));
         float* T = blendedTransforms.data<float>() + 16 * i;
-             
+
         for (int ii = 0; ii < 4; ++ii)
         {
             float x = 0;
             for (int jj = 0; jj < 4; ++jj)
             {
-                x += T[ii*4+jj]*v_in[jj];
+                x += T[ii * 4 + jj] * v_in[jj];
             }
             v_out[ii] = x;
-        }        
+        }
         posed_vertices.data<float>()[3 * i + 0] = v_out[0];
         posed_vertices.data<float>()[3 * i + 1] = v_out[1];
         posed_vertices.data<float>()[3 * i + 2] = v_out[2];
@@ -352,7 +352,7 @@ void smpl::LinearBlend(cnpy::NpyArray& v_shaped, cnpy::NpyArray& weights, cnpy::
 //-----------------------------------
 void smpl::Skeleton::parse(cnpy::NpyArray& Kinematic_tree)
 {
- 
+
     int* kinematic_tree = Kinematic_tree.data<int>();
     int N_nodes = Kinematic_tree.shape[1];
     for (int i = 0; i < N_nodes; ++i)
@@ -506,7 +506,7 @@ void apply_transform(float* mat4x4, float* P, float* dst)
 //-----------------------------------
 void smpl::Skeleton::setPose(std::vector<float>& joints_rots_vector)
 {
-    this->joints_rots_vector.assign(joints_rots_vector.begin(), joints_rots_vector.end());    
+    this->joints_rots_vector.assign(joints_rots_vector.begin(), joints_rots_vector.end());
 
     if (hands_mean.shape.size() > 0)
     {
@@ -521,7 +521,7 @@ void smpl::Skeleton::setPose(std::vector<float>& joints_rots_vector)
     // compute rotation matrices
     posemap_axisang(this->joints_rots_vector, pose_maps, template_joints_relative_rotations);
     template_joints_rel_coords = cnpy::NpyArray(template_joints_abs_coords.shape, template_joints_abs_coords.word_size, template_joints_abs_coords.fortran_order);
-    memcpy(template_joints_rel_coords.data<float>(), template_joints_abs_coords.data<float>() , 3 * sizeof(float));
+    memcpy(template_joints_rel_coords.data<float>(), template_joints_abs_coords.data<float>(), 3 * sizeof(float));
     // compute relative joint offsets
     for (int i = 0; i < chains.size(); i++)
     {
@@ -529,7 +529,7 @@ void smpl::Skeleton::setPose(std::vector<float>& joints_rots_vector)
         for (int j = 1; j < chains[i].size(); j++)
         {
             size_t joint_ind1 = chains[i][j - 1];
-            size_t joint_ind2 = chains[i][j];            
+            size_t joint_ind2 = chains[i][j];
             template_joints_rel_coords.data<float>()[joint_ind2 * 3 + 0] = template_joints_abs_coords.data<float>()[joint_ind2 * 3 + 0] - template_joints_abs_coords.data<float>()[joint_ind1 * 3 + 0];
             template_joints_rel_coords.data<float>()[joint_ind2 * 3 + 1] = template_joints_abs_coords.data<float>()[joint_ind2 * 3 + 1] - template_joints_abs_coords.data<float>()[joint_ind1 * 3 + 1];
             template_joints_rel_coords.data<float>()[joint_ind2 * 3 + 2] = template_joints_abs_coords.data<float>()[joint_ind2 * 3 + 2] - template_joints_abs_coords.data<float>()[joint_ind1 * 3 + 2];
@@ -549,8 +549,8 @@ void smpl::Skeleton::setPose(std::vector<float>& joints_rots_vector)
             size_t joint_ind1 = chains[i][j - 1];
             size_t joint_ind2 = chains[i][j];
             // now need to apply transform to joints
-            float* A   = joint_rel_transforms.data<float>() + joint_ind2 * 4 * 4;
-            float* B   = joint_abs_transforms.data<float>() + joint_ind1 * 4 * 4;
+            float* A = joint_rel_transforms.data<float>() + joint_ind2 * 4 * 4;
+            float* B = joint_abs_transforms.data<float>() + joint_ind1 * 4 * 4;
             float* dst = joint_abs_transforms.data<float>() + joint_ind2 * 4 * 4;
             if (!posed[joint_ind2])
             {
@@ -559,7 +559,7 @@ void smpl::Skeleton::setPose(std::vector<float>& joints_rots_vector)
                 //matMul4x4(B, A, dst);
             }
         }
-    }   
+    }
     cloneArray(template_joints_abs_coords, posed_joints_rel_coords);
     for (int n = 0; n < joint_abs_transforms.shape[0]; n++)
     {
@@ -573,7 +573,7 @@ void smpl::Skeleton::setPose(std::vector<float>& joints_rots_vector)
     for (int n = 0; n < joint_abs_transforms.shape[0]; n++)
     {
         float* dst = joint_rel_transforms.data<float>() + n * 4 * 4;
-        float* P = posed_joints_rel_coords.data<float>()+n * 3;
+        float* P = posed_joints_rel_coords.data<float>() + n * 3;
         dst[4 * 0 + 3] -= P[0];
         dst[4 * 1 + 3] -= P[1];
         dst[4 * 2 + 3] -= P[2];
@@ -642,29 +642,29 @@ void smpl::loadModel(std::string filename)
     printDims(weights);
     std::cout << std::endl;
 
-hands_components=npz_map["hands_components"];
-std::cout << "hands_components:";
-printDims(hands_components);
-std::cout << std::endl;
+    hands_components = npz_map["hands_components"];
+    std::cout << "hands_components:";
+    printDims(hands_components);
+    std::cout << std::endl;
 
-hands_coeffs = npz_map["hands_coeffs"];
-std::cout << "hands_coeffs";
-printDims(hands_coeffs);
-std::cout << std::endl;
-skeleton.hands_mean = npz_map["hands_mean"];
-std::cout << "hands_meean";
-printDims(skeleton.hands_mean);
-std::cout << std::endl;
-vetexNormals = cnpy::NpyArray(vertices_template.shape, vertices_template.word_size, vertices_template.fortran_order);
-normalsComputer = new NormalsComputer(faceIndices.as_vec<unsigned int>());
+    hands_coeffs = npz_map["hands_coeffs"];
+    std::cout << "hands_coeffs";
+    printDims(hands_coeffs);
+    std::cout << std::endl;
+    skeleton.hands_mean = npz_map["hands_mean"];
+    std::cout << "hands_meean";
+    printDims(skeleton.hands_mean);
+    std::cout << std::endl;
+    vetexNormals = cnpy::NpyArray(vertices_template.shape, vertices_template.word_size, vertices_template.fortran_order);
+    normalsComputer = std::make_shared<NormalsComputer>(faceIndices.as_vec<unsigned int>());
     std::cout << "---------------------------" << std::endl;
     std::cout << " Successfully loaded " << std::endl;
     std::cout << "---------------------------" << std::endl;
     std::vector<size_t> Beta_shape = { (size_t)shape_basis_dim };
-    Beta= cnpy::NpyArray(Beta_shape, sizeof(float), false);
-    std::vector<float> shape(shape_basis_dim,0);
-    std::vector<float> pose(joint_num * 3 , 0);
-    updateMesh(shape,pose);
+    Beta = cnpy::NpyArray(Beta_shape, sizeof(float), false);
+    std::vector<float> shape(shape_basis_dim, 0);
+    std::vector<float> pose(joint_num * 3, 0);
+    updateMesh(shape, pose);
 }
 //--------------------------------------------------------------------------
 //
@@ -673,7 +673,7 @@ void smpl::updateMesh(std::vector<float>& shape, std::vector<float>& pose)
 {
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
-    assert(joint_num*3 == pose.size());
+    assert(joint_num * 3 == pose.size());
     // ----------------------------------		
      // Compute initial shape and skeleton
      // ----------------------------------
@@ -690,7 +690,7 @@ void smpl::updateMesh(std::vector<float>& shape, std::vector<float>& pose)
         computeBlendShape(Beta, vertices_template, shapeBlendBasis, v_shaped);
         computeJointsFromShape(v_shaped, jointRegressor, jointCoords);
     }
-    cloneArray(jointCoords,skeleton.template_joints_abs_coords);
+    cloneArray(jointCoords, skeleton.template_joints_abs_coords);
     //print2dArray(jointCoords);    
     // --------------
     // Compute transflormations
@@ -720,7 +720,6 @@ smpl::smpl()
 }
 smpl::~smpl()
 {
-    delete normalsComputer;
 }
 //--------------------------------------------------------------------------
 // Compute shape driven by Beta coefficients.
@@ -777,7 +776,7 @@ void smpl::computeBlendPose(cnpy::NpyArray& PoseMap, cnpy::NpyArray& V_Shaped, c
                 int offset = 3 * poseBasisDim * i;
                 for (int k = 0; k < 3; ++k)
                 {
-                    float x = meanShape[3 * i + k];                    
+                    float x = meanShape[3 * i + k];
                     int stride = poseBasisDim * k;
                     for (int j = 0; j < poseBasisDim; ++j)
                     {
